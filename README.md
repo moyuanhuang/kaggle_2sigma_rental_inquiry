@@ -11,3 +11,4 @@ kaggle competition of Two Sigma Connect: Rental Listing Inquiries.
 7. manager_id
 8. feature
 9. created time
+10. \#.photos
