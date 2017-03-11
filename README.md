@@ -8,7 +8,7 @@ kaggle competition of Two Sigma Connect: Rental Listing Inquiries.
 4. longitude, latitude
 5. address
 6. description
-7. manager_id
+7. manager_id √ 
 8. feature
 9. created time
 10. \#.photos
