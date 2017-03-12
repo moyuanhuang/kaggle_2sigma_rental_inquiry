@@ -1,0 +1,167 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{nips15submit_e,times}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+%\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
+\usepackage{epstopdf}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{caption}
+\usepackage{multirow}
+
+
+\title{CSE258 Assignment 2}
+
+
+\author{
+Bolun Zhang, Moyuan Huang, Yixin Yang, Zhipeng Yan\\
+University of California, San Diego\\
+La Jolla, CA 92093 \\
+\texttt{\{boz028,moh,zhy136,yiy235\}@eng.ucsd.edu} 
+}
+
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\nipsfinalcopy % Uncomment for camera-ready version
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+In this report, we
+\end{abstract}
+
+\section{Introduction}
+\subsection{Dataset}
+\subsection{Task}
+
+% Section 2 model & features
+\section{Model Description}
+\subsection{feature selection}
+We assessed potential features from the dataset, including categorical features like \textit{feature} and \textit{manger id}, and \textit{todo}.
+\subsubsection{manager\_id}
+Every apartment posted in Renthop has a related manager which is presented as 'manager\_id' in each json entry. We think that this may be ultilized as a bias term for the interest level(similar to the user\_id and item\_id in assignment1), since different housing manager has different skills in selling apartment, and some of the managers may be usually very attractive to their clients.
+
+We first counted the number of apartments sold by each housing manager, and illustrated the distribution in fig.~\ref{fig:mng-cnt}. It is clear that the distribution can provide us with some information about how the managers are doing.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=2.5in]{fig/manager_sold_cnt}
+	\caption{distribution of total number of sold houses}
+	\label{fig:mng-cnt}
+\end{figure}
+
+To have more insight about the manager\_id, we further computed the fraction of each interest level for each manager, e.g. how many hoses sold by a housing manager is in high interest level? We visualized the the result in fig.~\ref{fig:frac}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=2.5in]{fig/frac}
+	\caption{Distribution of different interest fraction.}
+	\label{fig:frac}
+\end{figure}
+
+This statistic have such discriminative ability because an apartment's interest level can be determined by its corresponding manager. The apartment might receive high interest level if the manager has been selling high interest level houses, i.e. the  value high\_frac of the manager is high.
+
+We thus use this three statistics to represent the quality of the managers, and define \textit{manager\_skill} as
+$$ manager\_skill = 0 * low\_frac + 1 * medium\_frac + 2 * high\_frac $$
+After computing the manager\_skill, we make a quick evaluation of this metric, which is illustrated in Tab.~\ref{tab:skill}. We can see that the higher the interest level, the more manager skill it requires, which reveiled that our metric actually works. Detailed experiment results can be found in Section 4.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{cc}
+		interest level	&	manager skill \\ \hline \hline
+		low				&	0.341852		\\ 
+		medium			&	0.510785		\\
+		high			&	0.611761		\\
+	\end{tabular}
+	\caption{average manager skill of different interest levels.}
+	\label{tab:skill}
+\end{table}
+\subsubsection{feature}
+The feature stores a series of featuring of an apartment, for example, no fees, cats allowed, hardwood floor, etc. All of these could have impact on the interest level of the house. For example, in fig.~\ref{fig:dishwasher}, the interest level has different distribution depending on whehter \textit{dishwasher} is present or not. We then discuss how to include those features in our model.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3in]{fig/dishwasher}
+	\caption{different distribution of interest level with/without dishwasher.}
+	\label{fig:dishwasher}
+\end{figure}
+
+To achieve this, we first discretized those categorical features into separate features and count their appearance across the dataset. The top counted features are listed in Tab.~\ref{tab:ft-count}. We then used one hot representation of each top counted feature and concatenated them into the original feature set.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{cc}
+	feature			&	count \\ \hline \hline
+	elevator		&	26273 \\
+	hardwoodfloors	&	23558 \\
+	cats allowed	&	23540 \\
+	dogs allowed	&	22035 \\
+	doorman			&	20967 \\
+	dish washer		&	20806 \\
+	laundry in builing	&	18944 \\
+	no fee	&	18079 \\
+	fitness center	&	13257 \\
+	\end{tabular}
+	\caption{Top counted words.}
+	\label{tab:ft-count}
+\end{table}
+
+\subsubsection{Other attempts}
+Besides the features discussed above, we also selected some other features that we think may be informative, which is listed in Tab.~\ref{tab:other-ft}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{cc}
+		name	& explanation \\ \hline \hline
+		num\_photos	&	number of posted photos for the apartment. \\
+		num\_features	& number of features in the apartment feature. \\
+		created\_year	& year posted \\
+		created\_month	& month posted \\
+		created\_day		& dateposted \\
+		count			& total houses posted by this apartment's manager.
+	\end{tabular}
+	\caption{additional features}
+	\label{tab:other-ft}
+\end{table}
+
+
+% Section 3 Related Work
+\section{Related Work}
+
+
+% Section 4 Result
+\section{Result and Discussion}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{cc}
+		model	&	loss	 \\ \hline \hline
+		baseline	&	1 \\
+		trivial statistics			&	0.6514 \\
+		one hot Apt. features		&	0.6413 \\
+		manager skill \& count		&	0.6183 \\			
+	\end{tabular}
+	\caption{Multi-class loss of different models.}
+	\label{tab:result}
+\end{table}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3in]{fig/mng_skill_importance}
+	\caption{adding \textit{manager skill} and \textit{count}.}
+	\label{fig:skill-rst}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=3in]{fig/ft_importance}
+	\caption{adding \textit{manager skill}.}
+	\label{fig:skill-rst}
+\end{figure}
+
+
+
+\end{document}

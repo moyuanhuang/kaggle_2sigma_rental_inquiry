@@ -14,3 +14,5 @@ kaggle competition of Two Sigma Connect: Rental Listing Inquiries.
 10. \#.photos
 
 ## Overleaf: https://www.overleaf.com/8550429jkbmtprhjvwh#/30406087/
+
+March.12 Modified latex, can be found in ./latex/ass2.pdf and overleaf.	by Moyuan 
